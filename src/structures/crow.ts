@@ -14,6 +14,7 @@ import { Logger } from "../utils/Logger.js";
 import chalk from "chalk";
 import type { IEvent } from "../typings/Event";
 import { Guild } from "../utils/Guild.js";
+import mongoose from "mongoose";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -133,6 +134,20 @@ export class CROW extends Client {
     }
   }
 
+  async connectDB(): Promise<void> {
+    try {
+      await mongoose.connect(process.env.MONGOOSE_URI!);
+
+      this.logger.success(
+        `Connected to the ${chalk.yellowBright(
+          mongoose.connection.name
+        )} database successfully`
+      );
+    } catch (error) {
+      this.logger.error(`Database connection failed: ${error}`);
+    }
+  }
+
   async initialize(): Promise<void> {
     try {
       const commandPath = path.join(__dirname, "..", "commands");
@@ -143,6 +158,8 @@ export class CROW extends Client {
       await this.loadCommands(commandPath);
       await this.loadEvents(eventPath);
       await this.registerSlashCommands();
+
+      await this.connectDB();
 
       await this.login(process.env.CROW_TOKEN).then(() =>
         this.logger.success(`${chalk.magenta("crow APP")} started successfully`)

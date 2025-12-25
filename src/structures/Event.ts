@@ -1,4 +1,3 @@
-import type { ClientEvents } from "discord.js";
 import type { IEvent } from "../typings/Event";
 
 export abstract class Event implements IEvent {
