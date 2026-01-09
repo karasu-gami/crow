@@ -22,6 +22,9 @@ export class CROW extends Client {
         this.token = process.env.NODE_ENV === "production"
             ? process.env.CROW_TOKEN
             : process.env.CROW_TEST_TOKEN;
+        this.client_id = process.env.NODE_ENV === "production"
+            ? process.env.CLIENT_ID
+            : process.env.CLIENT_TEST_ID;
         this.logger = Logger;
     }
     async loadCommands(commandPath) {
@@ -35,6 +38,7 @@ export class CROW extends Client {
                     const commandImport = await import(`file://${filePath}`);
                     const command = commandImport.default;
                     if (command) {
+                        command.category = category;
                         this.commands.set(command.data.name, command);
                         commandCount++;
                         this.logger.module(`Loaded command: ${chalk.yellowBright(command.data.name)}`);
@@ -85,9 +89,9 @@ export class CROW extends Client {
     async registerSlashCommands() {
         try {
             const commands = Array.from(this.commands.values()).map((cmd) => cmd.data.toJSON());
-            const rest = new REST().setToken(process.env.CROW_TOKEN);
+            const rest = new REST().setToken(this.token);
             this.logger.log("Registering slash commands...");
-            const data = await rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, Guild.ID), { body: commands });
+            const data = await rest.put(Routes.applicationGuildCommands(this.client_id, Guild.ID), { body: commands });
             this.logger.success(`Successfully registered ${chalk.cyanBright(data.length + " slash command(s)")}`);
         }
         catch (error) {
