@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "node --loader ts-node/esm src/index.ts NODE_ENV=development",
     "build": "tsc",
-    "start": "node dist/index.js NODE_ENV=production",
-    "ts-node": "ts-node --esm"
+    "start": "node dist/index.js"
   },
   "build": "tsc",
   "start": "node dist/index.js NODE_ENV=production",
