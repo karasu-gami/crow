@@ -9,8 +9,15 @@ export default {
     .setDescription("replies crow latency"),
   async execute(interaction: ChatInputCommandInteraction) {
     await interaction.deferReply();
-    const latency = Date.now() - interaction.createdTimestamp;
 
-    await interaction.editReply(`Pong! Latency is ${latency}ms.`);
+    const reply = await interaction.fetchReply();
+
+    const latency = reply.createdTimestamp - interaction.createdTimestamp;
+
+    await interaction.editReply(
+      `Pong! My latency is \`${latency}ms\` and the API latency is \`${Math.round(
+        interaction.client.ws.ping
+      )}ms\`.`
+    );
   },
 };

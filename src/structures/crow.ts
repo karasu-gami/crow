@@ -36,6 +36,11 @@ export class CROW extends Client {
     this.logger = Logger;
   }
 
+  token =
+    process.env.NODE_ENV === "production"
+      ? process.env.CROW_TOKEN!
+      : process.env.CROW_TEST_TOKEN!;
+
   async loadCommands(commandPath: string): Promise<void> {
     try {
       let commandCount = 0;
@@ -161,7 +166,7 @@ export class CROW extends Client {
 
       await this.connectDB();
 
-      await this.login(process.env.CROW_TOKEN).then(() =>
+      await this.login(this.token).then(() =>
         this.logger.success(`${chalk.magenta("crow APP")} started successfully`)
       );
     } catch (error) {
