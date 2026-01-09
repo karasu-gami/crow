@@ -4,6 +4,7 @@ import type { CROW } from "./crow";
 
 export abstract class Command implements ICommand {
   data: SlashCommandBuilder;
+  category: string = "Uncategorized";
   abstract execute(interaction: CommandInteraction, crow: CROW): Promise<void>;
 
   constructor(data: SlashCommandBuilder) {

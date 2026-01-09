@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "node --loader ts-node/esm src/index.ts NODE_ENV=development",
     "build": "tsc",
-    "start": "node dist/index.js",
-    "deploy": "npm run build && git add . && git commit -m 'deploy' && git push"
+    "start": "node dist/index.js"
   },
   "build": "tsc",
   "start": "node dist/index.js NODE_ENV=production",
