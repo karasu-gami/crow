@@ -2,11 +2,12 @@
   "name": "crow",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.ts",
+  "main": "dist/index.js",
   "scripts": {
     "dev": "node --loader ts-node/esm src/index.ts NODE_ENV=development",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "deploy": "npm run build && git add . && git commit -m 'deploy' && git push"
   },
   "build": "tsc",
   "start": "node dist/index.js NODE_ENV=production",
