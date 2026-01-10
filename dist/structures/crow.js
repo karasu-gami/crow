@@ -109,10 +109,12 @@ export class CROW extends Client {
     }
     async initialize() {
         try {
-            const commandPath = path.join(__dirname, "..", "commands");
+            const slashCommandPath = path.join(__dirname, "..", "slashcommands");
+            const ctxCommandPath = path.join(__dirname, "..", "contextcommands");
             const eventPath = path.join(__dirname, "..", "events");
             this.logger.log(`${chalk.magentaBright("crow APP")} is starting...`);
-            await this.loadCommands(commandPath);
+            await this.loadCommands(slashCommandPath);
+            await this.loadCommands(ctxCommandPath);
             await this.loadEvents(eventPath);
             await this.registerSlashCommands();
             await this.connectDB();

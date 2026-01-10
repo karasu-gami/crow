@@ -36,37 +36,57 @@ export default {
       crow.logger.error(
         `No command matching ${interaction.commandName} was found.`
       );
+
+      if (!interaction.replied && !interaction.deferred) {
+        await interaction
+          .reply({
+            content: "The interaction did not respond, try again later!",
+            flags: [MessageFlags.Ephemeral],
+          })
+          .catch(() => {});
+      }
+      setTimeout(() => handled.delete(interaction.id), 60_000);
       return;
     }
-    if (interaction.isChatInputCommand()) {
+
+    // Common error handling function
+    const sendError = async () => {
+      if (!interaction.isRepliable()) return;
+
       try {
-        await command.execute(interaction, crow);
-      } catch (error: any) {
-        crow.logger.error(
-          `Error executing ${interaction.commandName}: ${error}`
-        );
-
-        if (!interaction.isRepliable()) return;
-        if (error.code === 10062 || error.code === 40060) return;
-
         if (interaction.replied || interaction.deferred) {
-          await interaction
-            .followUp({
-              content: "An error occurred while executing this command.",
-              flags: [MessageFlags.Ephemeral],
-            })
-            .catch(() => {});
+          await interaction.followUp({
+            content: "An error occurred while executing this command.",
+            flags: [MessageFlags.Ephemeral],
+          });
         } else {
-          await interaction
-            .reply({
-              content: "An error occurred while executing this command.",
-              flags: [MessageFlags.Ephemeral],
-            })
-            .catch(() => {});
+          await interaction.reply({
+            content: "An error occurred while executing this command.",
+            flags: [MessageFlags.Ephemeral],
+          });
         }
-      } finally {
-        setTimeout(() => handled.delete(interaction.id), 60_000);
+      } catch {}
+    };
+
+    const executeCommand = async () => {
+      await command.execute(interaction, crow);
+    };
+
+    try {
+      if (
+        interaction.isChatInputCommand() ||
+        interaction.isContextMenuCommand()
+      ) {
+        await executeCommand();
       }
+    } catch (error: any) {
+      crow.logger.error(`Error executing ${interaction.commandName}: ${error}`);
+
+      if (error.code === 10062 || error.code === 40060) return;
+
+      await sendError();
+    } finally {
+      setTimeout(() => handled.delete(interaction.id), 60_000);
     }
   },
 };

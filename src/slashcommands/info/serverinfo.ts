@@ -133,7 +133,8 @@ export default {
         iconURL: client.user.displayAvatarURL({
           size: 64,
         }),
-      });
+      })
+      .setTimestamp();
     if (guild?.iconURL()) {
       embed.setThumbnail(guild.iconURL({ size: 512 }));
     }
