@@ -103,6 +103,8 @@ export class CROW extends Client {
             this.logger.module(
               `Loaded event: ${chalk.yellowBright(
                 event.name
+              )} - ${chalk.magentaBright(
+                file
               )} from category: ${chalk.blueBright(category)}`
             );
           } else {

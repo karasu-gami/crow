@@ -20,13 +20,13 @@ export default {
     )
     .addUserOption((option) =>
       option
-        .setName("recipient")
+        .setName("target")
         .setDescription("The user to transfer coins to")
         .setRequired(true)
     ),
   async execute(interaction: ChatInputCommandInteraction) {
     const optionAmount = interaction.options.getNumber("amount");
-    const optionRecipient = interaction.options.getUser("recipient");
+    const optionTarget = interaction.options.getUser("target");
 
     await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
@@ -38,11 +38,11 @@ export default {
         coins: 0,
       });
 
-    const recipientProfile =
-      (await User.findOne({ userId: optionRecipient!.id })) ||
+    const targetProfile =
+      (await User.findOne({ userId: optionTarget!.id })) ||
       new User({
-        userId: optionRecipient!.id,
-        username: optionRecipient!.username,
+        userId: optionTarget!.id,
+        username: optionTarget!.username,
       });
 
     const userWallet = userProfile.economy?.wallet;
@@ -55,12 +55,12 @@ export default {
       try {
         userProfile.economy!.wallet -= optionAmount!;
         await userProfile.save();
-        recipientProfile.economy!.wallet += optionAmount!;
-        await recipientProfile.save();
+        targetProfile.economy!.wallet += optionAmount!;
+        await targetProfile.save();
 
         return interaction.editReply(
           `Successfully transferred ${optionAmount} coins to ${
-            optionRecipient!.username
+            optionTarget!.username
           }. Your new balance is ${userProfile.economy!.wallet} coins.`
         );
       } catch (error) {

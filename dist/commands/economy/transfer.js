@@ -12,12 +12,12 @@ export default {
         .setMinValue(1)
         .setMaxValue(1000000))
         .addUserOption((option) => option
-        .setName("recipient")
+        .setName("target")
         .setDescription("The user to transfer coins to")
         .setRequired(true)),
     async execute(interaction) {
         const optionAmount = interaction.options.getNumber("amount");
-        const optionRecipient = interaction.options.getUser("recipient");
+        const optionTarget = interaction.options.getUser("target");
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
         const userProfile = (await User.findOne({ userId: interaction.user.id })) ||
             new User({
@@ -25,10 +25,10 @@ export default {
                 username: interaction.user.username,
                 coins: 0,
             });
-        const recipientProfile = (await User.findOne({ userId: optionRecipient.id })) ||
+        const targetProfile = (await User.findOne({ userId: optionTarget.id })) ||
             new User({
-                userId: optionRecipient.id,
-                username: optionRecipient.username,
+                userId: optionTarget.id,
+                username: optionTarget.username,
             });
         const userWallet = userProfile.economy?.wallet;
         if (userWallet < optionAmount) {
@@ -38,9 +38,9 @@ export default {
             try {
                 userProfile.economy.wallet -= optionAmount;
                 await userProfile.save();
-                recipientProfile.economy.wallet += optionAmount;
-                await recipientProfile.save();
-                return interaction.editReply(`Successfully transferred ${optionAmount} coins to ${optionRecipient.username}. Your new balance is ${userProfile.economy.wallet} coins.`);
+                targetProfile.economy.wallet += optionAmount;
+                await targetProfile.save();
+                return interaction.editReply(`Successfully transferred ${optionAmount} coins to ${optionTarget.username}. Your new balance is ${userProfile.economy.wallet} coins.`);
             }
             catch (error) {
                 Logger.error(`Error transferring coins: ${error}`);

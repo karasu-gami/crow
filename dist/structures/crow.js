@@ -73,7 +73,7 @@ export class CROW extends Client {
                             this.on(event.name, (...args) => event.execute(...args));
                         }
                         eventCount++;
-                        this.logger.module(`Loaded event: ${chalk.yellowBright(event.name)} from category: ${chalk.blueBright(category)}`);
+                        this.logger.module(`Loaded event: ${chalk.yellowBright(event.name)} - ${chalk.magentaBright(file)} from category: ${chalk.blueBright(category)}`);
                     }
                     else {
                         this.logger.warn(`Failed to load event at ${filePath} - Missing ${chalk.yellowBright("'name'")} property`);
