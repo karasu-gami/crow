@@ -8,31 +8,40 @@ import {
 export default {
   data: new SlashCommandBuilder()
     .setName("avatar")
-    .setDescription("Show target`s avatar")
+    .setDescription("Show target member's guild avatar or user's global avatar")
     .addUserOption((option) =>
       option
         .setName("target")
-        .setDescription("The user to show the avatar of")
+        .setDescription("The user/member to show the avatar of")
         .setRequired(false)
     ),
   async execute(interaction: ChatInputCommandInteraction) {
+    const { client, guild } = interaction;
+
     const target = interaction.options.getUser("target") ?? interaction.user;
 
-    const avatarEmbed = new EmbedBuilder()
-      .setAuthor({
-        name: interaction.client.user.username,
-        iconURL: interaction.client.user.displayAvatarURL({ size: 1024 }),
-      })
-      .setTitle(`${target.username}'s Avatar`)
-      .setImage(target.displayAvatarURL({ size: 1024 }))
-      .setColor(target.accentColor ?? "Purple")
+    const member = guild?.members.cache.get(target.id);
+
+    const avatarUrl =
+      member?.avatarURL({ size: 4096, extension: "png" }) ??
+      target.displayAvatarURL({ size: 4096, extension: "png" });
+
+    const name = member ? member.displayName : target.username;
+
+    const embed = new EmbedBuilder()
+      .setTitle(member ? `${name}'s Guild Avatar` : `${name}'s Avatar`)
+      .setImage(avatarUrl)
+      .setColor(member?.displayColor || target.accentColor || "Purple")
       .setFooter({
-        text: `${target.username} - ${this.data.name}`,
-        iconURL: interaction.client.user.displayAvatarURL({ size: 1024 }),
-      });
+        text: `${client.user?.username} - ${this.data.name}`,
+        iconURL: client.user.displayAvatarURL({
+          size: 64,
+        }),
+      })
+      .setTimestamp();
 
     await interaction.reply({
-      embeds: [avatarEmbed],
+      embeds: [embed],
       flags: [MessageFlags.Ephemeral],
     });
   },
