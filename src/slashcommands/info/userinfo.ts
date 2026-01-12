@@ -76,7 +76,7 @@ export default {
       "4": "",
       "5": "Competing",
     };
-    const acitivityType = activity
+    const activityType = activity
       ? activityTypes[activity.type as ActivityType]
       : "";
 
@@ -98,7 +98,11 @@ export default {
       )
       .setDescription(
         `${statusEmoji} ${rawStatus} ${
-          activity && `| ${acitivityType} \`${activity.name}\``
+          activity &&
+          `| ${activityType} \`${activity.name.replace(
+            "Spotify",
+            `${activity.details} by ${activity.state}`
+          )}\``
         }`
       )
       .addFields(

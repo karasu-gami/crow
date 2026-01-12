@@ -50,7 +50,7 @@ export default {
             "4": "",
             "5": "Competing",
         };
-        const acitivityType = activity
+        const activityType = activity
             ? activityTypes[activity.type]
             : "";
         const embed = new EmbedBuilder()
@@ -63,7 +63,8 @@ export default {
             .setTitle(`${targetMember?.nickname ||
             targetMember?.displayName ||
             targetUser.username}'s Info`)
-            .setDescription(`${statusEmoji} ${rawStatus} ${activity && `| ${acitivityType} \`${activity.name}\``}`)
+            .setDescription(`${statusEmoji} ${rawStatus} ${activity &&
+            `| ${activityType} \`${activity.name.replace("Spotify", `${activity.details} by ${activity.state}`)}\``}`)
             .addFields({
             name: "Username",
             value: `\`@\`${targetUser.username}`,
