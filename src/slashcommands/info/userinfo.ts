@@ -149,10 +149,14 @@ export default {
 
     targetProfile?.rank &&
       embed.addFields(
-        { name: "EXP", value: `\`${targetProfile.rank.exp}\``, inline: true },
-        { name: "\u200b", value: `\u200b`, inline: true },
         {
           name: "Level",
+          value: `\`level ${targetProfile.rank.level}\``,
+          inline: true,
+        },
+        { name: "\u200b", value: `\u200b`, inline: true },
+        {
+          name: "EXP",
           value: `\`${targetProfile.rank.exp}\\${targetProfile.rank.levelUpExp}exp\``,
           inline: true,
         }
