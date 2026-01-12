@@ -63,7 +63,7 @@ export default {
             .setTitle(`${targetMember?.nickname ||
             targetMember?.displayName ||
             targetUser.username}'s Info`)
-            .setDescription(`${statusEmoji} ${rawStatus} ${activity &&
+            .setDescription(`${statusEmoji} ${rawStatus.charAt(0).toUpperCase() + rawStatus.slice(1)} ${activity &&
             `| ${activityType} \`${activity.name.replace("Spotify", `${activity.details} by ${activity.state}`)}\``}`)
             .addFields({
             name: "Username",

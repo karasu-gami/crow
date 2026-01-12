@@ -97,7 +97,9 @@ export default {
         }'s Info`
       )
       .setDescription(
-        `${statusEmoji} ${rawStatus} ${
+        `${statusEmoji} ${
+          rawStatus.charAt(0).toUpperCase() + rawStatus.slice(1)
+        } ${
           activity &&
           `| ${activityType} \`${activity.name.replace(
             "Spotify",
