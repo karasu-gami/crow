@@ -33,6 +33,13 @@ const userSchema = new mongoose.Schema({
             default: 100,
         },
     },
+    messages: [
+        {
+            content: String,
+            message_id: Number,
+            timestamp: Number,
+        },
+    ],
 });
 const User = mongoose.model("User", userSchema);
 export default User;

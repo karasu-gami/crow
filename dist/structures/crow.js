@@ -26,6 +26,9 @@ export class CROW extends Client {
         this.client_id = process.env.NODE_ENV === "production"
             ? process.env.CLIENT_ID
             : process.env.CLIENT_TEST_ID;
+        this.mongoose_uri = process.env.NODE_ENV === "production"
+            ? process.env.MONGOOSE_URI
+            : process.env.MONGOOSE_TEST_URI;
         this.logger = Logger;
     }
     async loadCommands(commandPath) {
@@ -101,7 +104,7 @@ export class CROW extends Client {
     }
     async connectDB() {
         try {
-            await mongoose.connect(process.env.MONGOOSE_URI);
+            await mongoose.connect(this.mongoose_uri);
             this.logger.success(`Connected to the ${chalk.yellowBright(mongoose.connection.name)} database successfully`);
         }
         catch (error) {
