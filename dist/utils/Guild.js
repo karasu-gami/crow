@@ -15,6 +15,10 @@ export const Guild = {
         quest_badge: "<:quest_badge:1459567183242723438>",
         nitro_badge: "<:opal_nitro_badge:1459567181905006745>",
         orbs_badge: "<:orbs_badge:1459567178381525083>",
+        online_status: "<:online_status:1460098932523663484>",
+        dnd_status: "<:dnd_status:1460098930082840596>",
+        idle_status: "<:idle_status:1460098934075686924>",
+        off_status: "<:off_status:1460098931248594944>",
     },
 };
 //# sourceMappingURL=Guild.js.map

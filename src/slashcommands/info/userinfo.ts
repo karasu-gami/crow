@@ -4,6 +4,9 @@ import {
   EmbedBuilder,
   MessageFlags,
   UserFlags,
+  type UserFlagsBitField,
+  type PresenceStatus,
+  type ActivityType,
 } from "discord.js";
 import User from "../../models/User.js";
 import { Guild } from "../../utils/Guild.js";
@@ -25,24 +28,57 @@ export default {
       interaction.options.getUser("target") || interaction.user;
     const targetMember = await guild?.members.fetch(targetUser);
 
-    const userProfile =
+    const targetProfile =
       (await User.findOne({ userId: targetUser.id })) ||
       new User({ userId: targetUser.id, username: targetUser.username });
 
     const targetFlags = targetUser.flags;
 
-    const badges = [];
+    const badges = targetFlags?.toArray() || [];
+    const badgeEmojis: Partial<
+      Record<keyof typeof UserFlagsBitField.Flags, string>
+    > = {
+      HypeSquadOnlineHouse1: Guild.emojis.hs_bravery,
+      HypeSquadOnlineHouse2: Guild.emojis.hs_brilliance,
+      HypeSquadOnlineHouse3: Guild.emojis.hs_balance,
+      Hypesquad: Guild.emojis.hypesquad_badge,
+    };
+    const badgeList = badges.map((b) => badgeEmojis[b]);
 
-    if (targetFlags && targetFlags.has(UserFlags.HypeSquadOnlineHouse1))
-      badges.push(Guild.emojis.hs_bravery);
-    if (targetFlags && targetFlags.has(UserFlags.HypeSquadOnlineHouse2))
-      badges.push(Guild.emojis.hs_brilliance);
-    if (targetFlags && targetFlags.has(UserFlags.HypeSquadOnlineHouse3))
-      badges.push(Guild.emojis.hs_balance);
-    if (targetFlags && targetFlags.has(UserFlags.Hypesquad))
-      badges.push(Guild.emojis.hypesquad_badge);
-    if (targetUser.avatarURL()?.endsWith(".gif") || targetUser.banner)
-      badges.push(Guild.emojis.nitro_badge);
+    const hasNitro =
+      targetUser.avatarURL({ size: 1024 })?.includes("animated=true") ||
+      targetMember?.avatarURL({ size: 1024 })?.includes("animated=true") ||
+      targetUser.banner ||
+      targetMember?.banner;
+    if (hasNitro) {
+      badgeList.push(Guild.emojis.nitro_badge);
+    }
+
+    const statusEmojis: Record<Lowercase<PresenceStatus>, string> = {
+      online: Guild.emojis.online_status,
+      idle: Guild.emojis.idle_status,
+      dnd: Guild.emojis.dnd_status,
+      offline: Guild.emojis.off_status,
+      invisible: Guild.emojis.off_status,
+    };
+
+    const rawStatus = ((targetMember?.presence?.status as PresenceStatus) ??
+      "offline") as Lowercase<PresenceStatus> | "offline";
+
+    const statusEmoji = statusEmojis[rawStatus] ?? Guild.emojis.off_status;
+
+    const activity = targetMember?.presence?.activities?.[0];
+    const activityTypes: Record<ActivityType, string> = {
+      "0": "Playing",
+      "1": "Streaming",
+      "2": "Listening",
+      "3": "Watching",
+      "4": "",
+      "5": "Competing",
+    };
+    const acitivityType = activity
+      ? activityTypes[activity.type as ActivityType]
+      : "";
 
     const embed = new EmbedBuilder()
       .setAuthor({
@@ -59,6 +95,11 @@ export default {
           targetMember?.displayName ||
           targetUser.username
         }'s Info`
+      )
+      .setDescription(
+        `${statusEmoji} ${rawStatus} ${
+          activity && `| ${acitivityType} \`${activity.name}\``
+        }`
       )
       .addFields(
         {
@@ -83,7 +124,7 @@ export default {
           value: `<t:${Math.floor(targetMember?.joinedTimestamp! / 1000)}:R>`,
           inline: true,
         },
-        { name: "Badges", value: `${badges.join(" ")}`, inline: false },
+        { name: "Badges", value: `${badgeList.join(" ")}`, inline: false },
         {
           name: "Roles",
           value: `${targetMember?.roles.cache
@@ -99,6 +140,17 @@ export default {
         iconURL: client.user.avatarURL({ size: 1024 })!,
       })
       .setTimestamp();
+
+    targetProfile?.rank &&
+      embed.addFields(
+        { name: "EXP", value: `\`${targetProfile.rank.exp}\``, inline: true },
+        { name: "\u200b", value: `\u200b`, inline: true },
+        {
+          name: "Level",
+          value: `\`${targetProfile.rank.exp}\\${targetProfile.rank.levelUpExp}exp\``,
+          inline: true,
+        }
+      );
 
     if (targetMember?.banner)
       embed.setImage(targetMember.bannerURL({ size: 1024 }) || null);
